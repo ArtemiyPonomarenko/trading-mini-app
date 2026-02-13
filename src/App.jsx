@@ -24,6 +24,78 @@ const TARIFFS = [
 
 const formatPrice = (p) => p.toLocaleString('ru-RU') + ' ₽';
 
+// Чаты
+const CHATS = [
+  {
+    id: 'support',
+    name: 'Поддержка курса',
+    avatar: '🎧',
+    avatarBg: 'linear-gradient(135deg, #10b981, #06b6d4)',
+    type: 'support',
+  },
+  {
+    id: 'general',
+    name: 'Общий чат',
+    avatar: '💬',
+    avatarBg: 'linear-gradient(135deg, #8b5cf6, #6366f1)',
+    type: 'group',
+  },
+  {
+    id: 'signals',
+    name: 'Торговые сигналы',
+    avatar: '📊',
+    avatarBg: 'linear-gradient(135deg, #f59e0b, #ef4444)',
+    type: 'channel',
+  },
+  {
+    id: 'module1',
+    name: 'Основы трейдинга',
+    avatar: '📈',
+    avatarBg: 'linear-gradient(135deg, #06b6d4, #3b82f6)',
+    type: 'group',
+  },
+  {
+    id: 'module2',
+    name: 'Технический анализ',
+    avatar: '📉',
+    avatarBg: 'linear-gradient(135deg, #ec4899, #f43f5e)',
+    type: 'group',
+  },
+];
+
+const INITIAL_MESSAGES = {
+  support: [
+    { id: 1, from: 'Поддержка', text: 'Добро пожаловать! Если у вас есть вопросы по курсу — пишите сюда.', time: '10:00', date: 'Сегодня', incoming: true },
+    { id: 2, from: 'you', text: 'Здравствуйте! Когда будет следующий вебинар?', time: '10:05', date: 'Сегодня', incoming: false },
+    { id: 3, from: 'Поддержка', text: 'Ближайший вебинар запланирован на эту пятницу в 19:00 МСК. Тема — "Паттерны Price Action".', time: '10:07', date: 'Сегодня', incoming: true },
+  ],
+  general: [
+    { id: 1, from: 'Алексей', text: 'Всем привет! Кто уже прошёл третий модуль?', time: '09:30', date: 'Вчера', incoming: true },
+    { id: 2, from: 'Мария', text: 'Я закончила вчера. Тесты непростые, но интересные!', time: '09:35', date: 'Вчера', incoming: true },
+    { id: 3, from: 'you', text: 'Я на втором модуле, скоро догоню)', time: '09:40', date: 'Вчера', incoming: false },
+    { id: 4, from: 'Дмитрий', text: 'Кто разобрался с дивергенцией на MACD? Нужна помощь', time: '11:20', date: 'Сегодня', incoming: true },
+    { id: 5, from: 'Мария', text: 'Дивергенция — это когда цена идёт вверх, а индикатор вниз (или наоборот). Посмотри урок 3.4, там подробно.', time: '11:25', date: 'Сегодня', incoming: true },
+  ],
+  signals: [
+    { id: 1, from: 'Аналитик', text: 'BTC/USDT — лонг от 42500, цель 44000, стоп 41800', time: '08:00', date: 'Вчера', incoming: true },
+    { id: 2, from: 'Аналитик', text: 'ETH/USDT — наблюдаем. Пробой 2250 — вход в лонг с целью 2400.', time: '08:15', date: 'Вчера', incoming: true },
+    { id: 3, from: 'Аналитик', text: 'BTC — цель 44000 достигнута! Фиксируем +3.5%', time: '14:30', date: 'Сегодня', incoming: true },
+    { id: 4, from: 'Аналитик', text: 'SOL/USDT — лонг от 95, цель 102, стоп 92. R/R = 1:2.3', time: '15:00', date: 'Сегодня', incoming: true },
+  ],
+  module1: [
+    { id: 1, from: 'Куратор', text: 'Добро пожаловать в чат модуля "Основы трейдинга"! Обсуждаем уроки и задаём вопросы.', time: '09:00', date: 'Пн', incoming: true },
+    { id: 2, from: 'Виктор', text: 'Подскажите, в чём разница между лимитным и рыночным ордером?', time: '12:00', date: 'Пн', incoming: true },
+    { id: 3, from: 'Куратор', text: 'Рыночный ордер исполняется сразу по текущей цене. Лимитный — только когда цена дойдёт до вашего уровня. Подробно — в уроке 1.3.', time: '12:10', date: 'Пн', incoming: true },
+  ],
+  module2: [
+    { id: 1, from: 'Куратор', text: 'Чат модуля "Технический анализ". Здесь обсуждаем графики, свечи и уровни.', time: '10:00', date: 'Вт', incoming: true },
+    { id: 2, from: 'Елена', text: 'Как правильно определить уровни поддержки и сопротивления?', time: '14:00', date: 'Вт', incoming: true },
+    { id: 3, from: 'Куратор', text: 'Ищите зоны, от которых цена отскакивала 2-3 раза. Используйте старший таймфрейм (H4, D1). Урок 2.2 как раз об этом.', time: '14:15', date: 'Вт', incoming: true },
+  ],
+};
+
+const CHAT_STORAGE_KEY = 'trading_app_chats';
+
 // Стили
 const styles = {
   app: {
@@ -333,6 +405,123 @@ const styles = {
     borderRadius: 3,
     transition: 'width 0.3s',
   },
+
+  // Chat
+  chatCard: {
+    background: 'rgba(255,255,255,0.04)',
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 10,
+    border: '1px solid rgba(255,255,255,0.06)',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+    cursor: 'pointer',
+    transition: 'background 0.2s',
+  },
+  chatAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: 20,
+    flexShrink: 0,
+  },
+  chatInfo: { flex: 1, overflow: 'hidden' },
+  chatName: { fontWeight: 600, fontSize: 15, marginBottom: 2 },
+  chatLastMsg: { color: '#6b7280', fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+  chatMeta: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 },
+  chatTime: { color: '#6b7280', fontSize: 11 },
+  chatBadge: {
+    background: 'linear-gradient(90deg, #10b981, #06b6d4)',
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: 700,
+    width: 20,
+    height: 20,
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  chatMessages: {
+    flex: 1,
+    overflowY: 'auto',
+    padding: '16px 16px 8px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 8,
+  },
+  msgBubble: {
+    maxWidth: '80%',
+    padding: '10px 14px',
+    borderRadius: 16,
+    fontSize: 14,
+    lineHeight: 1.5,
+    wordBreak: 'break-word',
+  },
+  msgIncoming: {
+    alignSelf: 'flex-start',
+    background: 'rgba(255,255,255,0.08)',
+    borderBottomLeftRadius: 4,
+    color: '#e5e7eb',
+  },
+  msgOutgoing: {
+    alignSelf: 'flex-end',
+    background: 'linear-gradient(135deg, rgba(16,185,129,0.3), rgba(6,182,212,0.25))',
+    borderBottomRightRadius: 4,
+    color: '#fff',
+  },
+  msgTime: { fontSize: 10, color: '#6b7280', marginTop: 4 },
+  msgDateSep: {
+    textAlign: 'center',
+    color: '#6b7280',
+    fontSize: 12,
+    margin: '8px 0',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+  },
+  msgDateLine: { flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' },
+  chatInputBar: {
+    display: 'flex',
+    gap: 8,
+    padding: '12px 16px',
+    background: 'rgba(17,17,17,0.95)',
+    borderTop: '1px solid rgba(255,255,255,0.08)',
+  },
+  chatInput: {
+    flex: 1,
+    background: 'rgba(255,255,255,0.08)',
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: 20,
+    padding: '10px 16px',
+    color: '#fff',
+    fontSize: 14,
+    outline: 'none',
+  },
+  chatSendBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: '50%',
+    background: 'linear-gradient(135deg, #10b981, #06b6d4)',
+    border: 'none',
+    color: '#fff',
+    fontSize: 18,
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  chatSenderName: {
+    fontSize: 12,
+    fontWeight: 600,
+    color: '#10b981',
+    marginBottom: 2,
+  },
 };
 
 // CSS анимации
@@ -350,6 +539,15 @@ export default function App() {
   const [screen, setScreen] = useState('home');
   const [selectedTariff, setSelectedTariff] = useState(null);
   const [selectedModule, setSelectedModule] = useState(null);
+  const [selectedChat, setSelectedChat] = useState(null);
+  const [chatMessages, setChatMessages] = useState(() => {
+    try {
+      const saved = localStorage.getItem(CHAT_STORAGE_KEY);
+      return saved ? JSON.parse(saved) : INITIAL_MESSAGES;
+    } catch {
+      return INITIAL_MESSAGES;
+    }
+  });
   const [user, setUser] = useState({
     name: tg.initDataUnsafe?.user?.first_name || 'Демо',
     purchased: false,
@@ -362,11 +560,18 @@ export default function App() {
     tg.expand?.();
   }, []);
 
+  useEffect(() => {
+    try {
+      localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(chatMessages));
+    } catch {}
+  }, [chatMessages]);
+
   // Навигация
   const NAV = [
     { id: 'home', icon: '📈', label: 'Главная' },
     { id: 'tariffs', icon: '⭐', label: 'Тарифы' },
     { id: 'course', icon: '📚', label: 'Курс' },
+    { id: 'chats', icon: '💬', label: 'Чаты' },
     { id: 'profile', icon: '👤', label: 'Профиль' },
   ];
 
@@ -604,6 +809,193 @@ export default function App() {
     );
   };
 
+  // Экран: Список чатов
+  const ChatListScreen = () => {
+    const getLastMessage = (chatId) => {
+      const msgs = chatMessages[chatId];
+      return msgs && msgs.length > 0 ? msgs[msgs.length - 1] : null;
+    };
+
+    const getUnread = (chatId) => {
+      const msgs = chatMessages[chatId];
+      if (!msgs) return 0;
+      return msgs.filter(m => m.incoming && !m.read).length;
+    };
+
+    return (
+      <div style={styles.container}>
+        <h1 style={{ ...styles.sectionTitle, marginBottom: 16 }}>Чаты</h1>
+
+        {!user.purchased ? (
+          <div style={styles.lockedBox}>
+            <div style={styles.lockedIcon}>🔒</div>
+            <div style={styles.lockedTitle}>Чаты недоступны</div>
+            <div style={styles.lockedText}>Оформите подписку для доступа к чатам курса</div>
+            <button
+              style={{ ...styles.btnPrimary, width: 'auto', padding: '12px 24px' }}
+              onClick={() => setScreen('tariffs')}
+            >
+              Выбрать тариф
+            </button>
+          </div>
+        ) : (
+          CHATS.map(chat => {
+            const last = getLastMessage(chat.id);
+            const unread = getUnread(chat.id);
+            return (
+              <div
+                key={chat.id}
+                style={styles.chatCard}
+                onClick={() => {
+                  setSelectedChat(chat);
+                  // Mark messages as read
+                  setChatMessages(prev => ({
+                    ...prev,
+                    [chat.id]: (prev[chat.id] || []).map(m => ({ ...m, read: true })),
+                  }));
+                  setScreen('chat');
+                }}
+              >
+                <div style={{ ...styles.chatAvatar, background: chat.avatarBg }}>
+                  {chat.avatar}
+                </div>
+                <div style={styles.chatInfo}>
+                  <div style={styles.chatName}>{chat.name}</div>
+                  <div style={styles.chatLastMsg}>
+                    {last ? (last.incoming ? `${last.from}: ${last.text}` : `Вы: ${last.text}`) : 'Нет сообщений'}
+                  </div>
+                </div>
+                <div style={styles.chatMeta}>
+                  {last && <div style={styles.chatTime}>{last.time}</div>}
+                  {unread > 0 && <div style={styles.chatBadge}>{unread}</div>}
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+    );
+  };
+
+  // Экран: Чат (переписка)
+  const ChatScreen = () => {
+    const [inputText, setInputText] = useState('');
+    const messagesEndRef = React.useRef(null);
+    const messages = chatMessages[selectedChat?.id] || [];
+
+    const scrollToBottom = () => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    useEffect(() => {
+      scrollToBottom();
+    }, [messages.length]);
+
+    const sendMessage = () => {
+      const text = inputText.trim();
+      if (!text) return;
+
+      const now = new Date();
+      const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+      const newMsg = {
+        id: Date.now(),
+        from: 'you',
+        text,
+        time: timeStr,
+        date: 'Сегодня',
+        incoming: false,
+        read: true,
+      };
+
+      setChatMessages(prev => ({
+        ...prev,
+        [selectedChat.id]: [...(prev[selectedChat.id] || []), newMsg],
+      }));
+      setInputText('');
+    };
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    };
+
+    // Group messages by date
+    const groupedMessages = [];
+    let lastDate = null;
+    messages.forEach(msg => {
+      if (msg.date !== lastDate) {
+        groupedMessages.push({ type: 'date', date: msg.date });
+        lastDate = msg.date;
+      }
+      groupedMessages.push({ type: 'msg', ...msg });
+    });
+
+    const isChannel = selectedChat?.type === 'channel';
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 80px)' }}>
+        {/* Header */}
+        <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <button style={{ ...styles.btnBack, marginBottom: 0 }} onClick={() => setScreen('chats')}>
+            ←
+          </button>
+          <div style={{ ...styles.chatAvatar, width: 36, height: 36, fontSize: 16, background: selectedChat?.avatarBg }}>
+            {selectedChat?.avatar}
+          </div>
+          <div>
+            <div style={{ fontWeight: 600, fontSize: 15 }}>{selectedChat?.name}</div>
+            <div style={{ color: '#6b7280', fontSize: 12 }}>
+              {selectedChat?.type === 'support' ? 'Онлайн' : selectedChat?.type === 'channel' ? 'Канал' : 'Группа'}
+            </div>
+          </div>
+        </div>
+
+        {/* Messages */}
+        <div style={styles.chatMessages}>
+          {groupedMessages.map((item, i) => {
+            if (item.type === 'date') {
+              return (
+                <div key={`date-${i}`} style={styles.msgDateSep}>
+                  <div style={styles.msgDateLine}></div>
+                  <span>{item.date}</span>
+                  <div style={styles.msgDateLine}></div>
+                </div>
+              );
+            }
+            return (
+              <div key={item.id} style={{ ...styles.msgBubble, ...(item.incoming ? styles.msgIncoming : styles.msgOutgoing) }}>
+                {item.incoming && selectedChat?.type === 'group' && (
+                  <div style={styles.chatSenderName}>{item.from}</div>
+                )}
+                <div>{item.text}</div>
+                <div style={{ ...styles.msgTime, textAlign: item.incoming ? 'left' : 'right' }}>{item.time}</div>
+              </div>
+            );
+          })}
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Input */}
+        {!isChannel && (
+          <div style={styles.chatInputBar}>
+            <input
+              style={styles.chatInput}
+              placeholder="Сообщение..."
+              value={inputText}
+              onChange={e => setInputText(e.target.value)}
+              onKeyDown={handleKeyDown}
+            />
+            <button style={styles.chatSendBtn} onClick={sendMessage}>
+              ↑
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   // Экран: Профиль
   const ProfileScreen = () => (
     <div style={styles.container}>
@@ -678,6 +1070,8 @@ export default function App() {
       case 'success': return <SuccessScreen />;
       case 'course': return <CourseScreen />;
       case 'module': return <ModuleScreen />;
+      case 'chats': return <ChatListScreen />;
+      case 'chat': return <ChatScreen />;
       case 'profile': return <ProfileScreen />;
       default: return <HomeScreen />;
     }
@@ -697,8 +1091,8 @@ export default function App() {
               key={item.id}
               style={{
                 ...styles.navItem,
-                ...(screen === item.id || (item.id === 'home' && screen === 'module') ? styles.navItemActive : {}),
-                color: screen === item.id ? '#10b981' : '#6b7280',
+                ...(screen === item.id || (item.id === 'home' && screen === 'module') || (item.id === 'chats' && screen === 'chat') ? styles.navItemActive : {}),
+                color: screen === item.id || (item.id === 'chats' && screen === 'chat') ? '#10b981' : '#6b7280',
               }}
               onClick={() => setScreen(item.id)}
             >
